@@ -1,4 +1,4 @@
-import { css } from 'styled-components/macro'
+import { css } from 'styled-components'
 import { AppTheme } from './theme'
 
 declare module 'styled-components/macro' {

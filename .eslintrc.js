@@ -23,6 +23,7 @@ module.exports = {
   rules: {
     // NOTE: conflicts with prettier
     "@typescript-eslint/indent": "off",
+    "react/require-default-props": "off",
     "no-plusplus":0,
     "react/jsx-indent-props": 0,
     "@typescript-eslint/ban-ts-ignore": "off",
