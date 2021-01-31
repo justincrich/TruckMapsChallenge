@@ -1,0 +1,6 @@
+src/stories/**/*.tsx
+config-overrides.js
+lint*.js
+jestServerConfig.js
+.next
+next.*
