@@ -1,5 +1,5 @@
 import React from 'react'
 
-export const Layout = () => {
+export const Layout = (): JSX.Element => {
     return <div />
 }
