@@ -1,0 +1,7 @@
+export const SOCKET_EVENTS = {
+    CONNECTION: 'CONNECTION',
+    INIT: 'INIT',
+    POST_MESSAGE: 'POST_MESSAGE',
+    NEW_MESSAGE: 'NEW_MESSAGE',
+    NEW_USER: 'NEW_USER',
+} as const
