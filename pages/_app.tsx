@@ -1,4 +1,4 @@
-import { Container, AppInitialProps, AppContext } from 'next/app'
+import { AppInitialProps, AppContext } from 'next/app'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from '../styles/ThemeProvider'
@@ -9,13 +9,11 @@ export default function App(props: AppContext & AppInitialProps): JSX.Element {
     const { Component, pageProps } = props
     const store = useStore(pageProps.initialReduxState)
     return (
-        <Container>
-            <Provider store={store}>
-                <ThemeProvider theme={theme}>
-                    <Component {...pageProps} />
-                </ThemeProvider>
-            </Provider>
-        </Container>
+        <Provider store={store}>
+            <ThemeProvider theme={theme}>
+                <Component {...pageProps} />
+            </ThemeProvider>
+        </Provider>
     )
 }
 

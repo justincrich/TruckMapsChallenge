@@ -1,23 +1,16 @@
 import { ListenerType } from './type'
 import { ChatMessage } from '../util/types'
-import { getChatSocket } from '../util/getChatSocket'
-import { SOCKET_EVENTS } from '../util/constants'
-import { parseEventError } from './tools'
+import { subscribeToSocketEvent, emitToSocket } from '../util/socket'
 import { SERVER_URL } from '../config/env'
 
-const socket = getChatSocket()
-
-const subscribeToChatLog: ListenerType<ChatMessage> = (onValue, onError) => {
-    socket.on(SOCKET_EVENTS.NEW_MESSAGE, (data: any) => {
-        if (parseEventError(data)) {
-            return onError(new Error(data.error))
-        }
-        return onValue(data as ChatMessage)
+const subscribeToChatLog: ListenerType<ChatMessage> = (onValue, onError) =>
+    subscribeToSocketEvent({
+        event: 'NEW_MESSAGE',
+        onValue,
+        onError,
     })
-    return () => {
-        socket.off(SOCKET_EVENTS.NEW_MESSAGE)
-    }
-}
+const emitMessage = (message: ChatMessage): void =>
+    emitToSocket<ChatMessage>('SEND_MESSAGE', message)
 
 const sendMessage = async (
     message: ChatMessage,
@@ -35,4 +28,5 @@ const sendMessage = async (
 export const chatClient = {
     subscribeToChatLog,
     sendMessage,
+    emitMessage,
 }

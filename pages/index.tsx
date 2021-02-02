@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import React from 'react'
-import isEqual from 'lodash/isEqual'
+import styled from 'styled-components'
 import { NextPage } from 'next'
 import { Layout } from '../components/Layout'
 import { useChatClient } from '../hooks/useChatClient'
@@ -10,6 +10,7 @@ import { initializeStore, buildBaseState } from '../store/index'
 import { RootState } from '../store/rootReducer'
 import { userClient } from '../clients/UserClient'
 import { useUserClient } from '../hooks/useUserClient'
+import { SignupModal } from '../components/SignupModal'
 
 type Props = {
     chatHistory: ChatMessage[]
@@ -17,7 +18,7 @@ type Props = {
 }
 
 const Home: NextPage<Props> = ({ chatHistory }) => {
-    const { userDirectory } = useUserClient()
+    const { userDirectory, you } = useUserClient()
     const { messages } = useChatClient(chatHistory)
 
     const chatMessages = messages || chatHistory
@@ -26,9 +27,8 @@ const Home: NextPage<Props> = ({ chatHistory }) => {
 
     return (
         <Layout>
-            <div className="hero">
-                <h1 className="title">Welcome to Next!</h1>
-            </div>
+            <h1 className="title">Chat App</h1>
+            {!you ? <SignupModal /> : <div />}
         </Layout>
     )
 }

@@ -1,4 +1,4 @@
-import { css, CSSObject, SimpleInterpolation } from 'styled-components/macro'
+import { css, CSSObject, SimpleInterpolation } from 'styled-components'
 
 export const MaxWidthBreakpoints = {
     mobile: 375,

@@ -1,22 +1,33 @@
-import { Request, Response, Router } from 'express'
-import { chatClient } from './ChatServerClient'
+import { Router } from 'express'
+import SocketIo from 'socket.io'
+import { chatDb } from './ChatDB'
 import { User, ChatMessage } from '../util/types'
 import { SOCKET_EVENTS } from '../util/constants'
 
-export const router = Router()
+export const chatRouter = (io: SocketIo.Server): Router => {
+    const router = Router()
+    router.get('/history', (_, res) => {
+        res.json(chatDb.getAllMessages())
+    })
 
-router.get('/history', (_, res) => {
-    res.json(chatClient.getAllMessages())
-})
+    router.put<undefined, object | undefined, ChatMessage>('/', (req, res) => {
+        const { body } = req
+        try {
+            if (!body) throw new Error('Invalid data')
+            chatDb.setMessage(body)
+            io.emit(SOCKET_EVENTS.NEW_MESSAGE, body)
+            res.sendStatus(200)
+        } catch (e) {
+            res.status(400).json({ error: e.message })
+        }
+    })
 
-router.put<undefined, object | undefined, ChatMessage>('/', (req, res) => {
-    const { body } = req
-    try {
-        if (!body) throw new Error('Invalid data')
-        chatClient.setMessage(body)
-        res.io.emit(SOCKET_EVENTS.NEW_MESSAGE, body)
-        res.sendStatus(200)
-    } catch (e) {
-        res.status(400).json({ error: e.message })
-    }
-})
+    io.on(SOCKET_EVENTS.CONNECTION_SERVER, (socket: SocketIo.Socket) => {
+        socket.on(SOCKET_EVENTS.SEND_MESSAGE, (message: ChatMessage) => {
+            chatDb.setMessage(message)
+            socket.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+        })
+    })
+
+    return router
+}

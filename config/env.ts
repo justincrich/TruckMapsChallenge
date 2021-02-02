@@ -9,3 +9,5 @@ const selectVariable = (key: EnvVariable): never => {
 export const URL =
     process.env.NEXT_PUBLIC_HOST || selectVariable('NEXT_PUBLIC_HOST')
 export const SERVER_URL = `${URL}/api`
+
+export const IS_CLIENT = !!process.browser

@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components/macro'
+import styled from 'styled-components'
 import * as Icons from 'react-icons/fa'
 import { sizing } from '../styles/mixins/constants'
 import { color as colorSelect } from '../styles/color'

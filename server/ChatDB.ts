@@ -1,6 +1,6 @@
 import { ChatMessage, User } from '../util/types'
 
-class ChatClient {
+class ChatDB {
     private messages: ChatMessage[] = [
         {
             message: 'hii',
@@ -17,6 +17,7 @@ class ChatClient {
 
     setMessage(message: ChatMessage): void {
         this.messages.push(message)
+        console.warn('new messages', this.messages)
     }
 
     getAllMessages(): ChatMessage[] {
@@ -37,4 +38,4 @@ class ChatClient {
     }
 }
 
-export const chatClient = new ChatClient()
+export const chatDb = new ChatDB()

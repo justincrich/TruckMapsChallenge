@@ -8,119 +8,55 @@ import {
 import { createActionType } from './utils'
 import { User, UserDirectory } from '../util/types'
 import { initialUserState } from './initialStates'
-import { getChatSocket } from '../util/getChatSocket'
-
-export interface UserState {
-    you: {
-        value: User | null
-        loading: boolean
-        error: SerializedError | null
-    }
-    directory: {
-        value: Record<string, User>
-        loading: boolean
-        error: SerializedError | null
-    }
-}
+import { userClient } from '../clients/UserClient'
+import { UserState } from './types'
 
 const REDUCER_NAME = 'user'
 
-const socket = getChatSocket()
+// const socket = subscribeToSocketEvent()
 
-const createAuthActionType = (name: string): string =>
+const createUserActionType = (name: string): string =>
     createActionType(name, REDUCER_NAME)
 
-// export const subscribeAuth = createAsyncThunk(
-//     createAuthActionType('subscribeAuth'),
-//     (envId: string | null, thunkApi): void => {
-//         const handleAuthUpdate = async (
-//             params: { uid: string; email: string | null } | null
-//         ): Promise<void> => {
-//             const { uid, email } = params || {}
+export const registerUser = createAsyncThunk(
+    createUserActionType('registerUser'),
+    ({ email, name }: { email: string; name: string }): User => {
+        const user = { userId: email, name }
+        userClient.emitUser(user)
+        return user
+    }
+)
 
-//             if (!uid || !envId) {
-//                 thunkApi.dispatch(authChange(null))
-//                 return
-//             }
-//             const token = await authClient.getToken()
-//             thunkApi.dispatch(authSlice.actions.authAddToken(token))
-//         }
-
-//         authClient.subscribeToAuthChanges(
-//             (args) => {
-//                 handleAuthUpdate(args)
-//             },
-//             (error) => {
-//                 throw error
-//             }
-//         )
-//     }
-// )
-
-interface SignInParams {
-    email: string
-    password: string
-}
-
-// export const requestSignIn = createAsyncThunk(
-//     createAuthActionType('login'),
-//     async (params: SignInParams): Promise<void> => {
-//         const { email, password } = params
-//         await authClient.emailSignIn({ email, password })
-//     }
-// )
-
-// export const signOut = createAsyncThunk(
-//     createAuthActionType('signOut'),
-//     (): Promise<void> => authClient.signOut()
-// )
-
-const authSlice = createSlice({
+const userSlice = createSlice({
     name: REDUCER_NAME,
     initialState: initialUserState,
     reducers: {
-        // loginSuccess(draft, action: PayloadAction<User>) {
-        //     draft.user = { value: action.payload, error: null, loading: false }
-        // },
-        // authChange(draft, action: PayloadAction<User | null>) {
-        //     draft.value = action.payload
-        //     draft.loading = false
-        //     draft.error = null
-        // },
-        // setAuthLoading(draft, action: PayloadAction<boolean>) {
-        //     draft.loading = action.payload
-        // },
-        // authAddToken(draft, action: PayloadAction<string>) {
-        //     draft.token = action.payload
-        // },
+        addUser(draft, { payload }: PayloadAction<User>) {
+            draft.directory.value[payload.userId] = payload
+        },
+        userDirectoryError(draft, { payload }: PayloadAction<Error>) {
+            draft.directory.error = payload
+        },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(registerUser.pending, (draft) => {
+            draft.you.value = null
+            draft.you.loading = true
+            draft.you.error = null
+        })
+        builder.addCase(registerUser.rejected, (draft, action) => {
+            draft.you.error = action.error
+            draft.you.loading = false
+        })
+        builder.addCase(registerUser.fulfilled, (draft, action) => {
+            draft.you.value = action.payload
+            draft.you.loading = false
+            draft.you.error = null
+        })
     },
 })
-/**
- *     extraReducers: (builder) => {
-        builder.addCase(signOut.fulfilled, (draft) => {
-            draft.value = null
-            draft.token = null
-        })
-        builder.addCase(requestSignIn.pending, (draft) => {
-            draft.loading = true
-            draft.error = null
-        })
-        // builder.addCase(requestSignIn.fulfilled, (draft, action) => {
-        //     draft.loading = false
-        //     draft.user = action.payload
-        // })
-        builder.addCase(requestSignIn.rejected, (draft, action) => {
-            draft.loading = false
-            draft.error = action.error
-        })
-        builder.addCase(subscribeAuth.rejected, (draft, action) => {
-            console.log('ACTION', action)
-            draft.error = action.error
-            draft.loading = false
-        })
-    },
- */
-// export const { authChange, setAuthLoading } = authSlice.actions
+
+export const { addUser, userDirectoryError } = userSlice.actions
 
 interface AppState {
     user: UserState
@@ -141,4 +77,4 @@ export const selectUserYouError = (state: AppState): SerializedError | null =>
 export const selectUserDirectory = (state: AppState): UserDirectory =>
     state.user.directory.value
 
-export const { reducer } = authSlice
+export const { reducer } = userSlice

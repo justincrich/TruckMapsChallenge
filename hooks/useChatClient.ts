@@ -2,6 +2,7 @@ import { useEffect, useReducer, Reducer } from 'react'
 import produce from 'immer'
 import { ChatMessage } from '../util/types'
 import { chatClient } from '../clients/ChatClient'
+import { useClientSubscription } from './useClientSubscription'
 
 type State = {
     error: null | Error
@@ -28,7 +29,7 @@ const reducer: Reducer<State, Action> = (state, action) =>
     })
 
 type Return = {
-    send: (message: ChatMessage, userId: string) => Promise<void>
+    send: (message: ChatMessage, userId: string) => void
     messages: ChatMessage[] | null
     error: Error | null
 }
@@ -38,23 +39,16 @@ export const useChatClient = (initialMessages: ChatMessage[]): Return => {
         value: initialMessages,
         error: null,
     })
-
-    const isClient = typeof window !== 'undefined'
-
-    useEffect(() => {
-        if (!isClient) {
-            return () => {}
-        }
-        const unsubscribe = chatClient.subscribeToChatLog(
-            (message) => dispatch({ type: 'SET_MESSAGE', payload: message }),
-            (nextError) => dispatch({ type: 'SET_ERROR', payload: nextError })
-        )
-        return unsubscribe
-    }, [isClient])
+    useClientSubscription<ChatMessage>({
+        clientSubscriptionFn: chatClient.subscribeToChatLog,
+        onValue: (message) =>
+            dispatch({ type: 'SET_MESSAGE', payload: message }),
+        onError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
+    })
 
     return {
         messages: state.value,
         error: state.error,
-        send: chatClient.sendMessage,
+        send: (message) => chatClient.emitMessage(message),
     }
 }

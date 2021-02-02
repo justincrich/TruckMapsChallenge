@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components/macro'
+import styled from 'styled-components'
 import { SPACING_PX } from '../styles/mixins/constants'
 
 type Props = {

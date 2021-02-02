@@ -5,17 +5,8 @@ import BodyParser from 'body-parser'
 import NextJS from 'next'
 import SocketIo from 'socket.io'
 
-import { router as userRouter } from './user'
-import { router as chatRouter } from './chat'
-
-declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Express {
-        interface Response {
-            io: SocketIo.Server
-        }
-    }
-}
+import { userRouter } from './user'
+import { chatRouter } from './chat'
 
 dotenv.config()
 const port = process.env.PORT || 3000
@@ -28,13 +19,13 @@ const handle = app.getRequestHandler()
 const initiateServer = async (): Promise<void> => {
     try {
         const router = express()
+
         const server = createServer(router)
         await app.prepare()
         router.use(BodyParser.json())
         const io = new SocketIo.Server(server)
-        router.response.io = io
-        router.use(`${BASE_PATH}/users`, userRouter)
-        router.use(`${BASE_PATH}/chat`, chatRouter)
+        router.use(`${BASE_PATH}/users`, userRouter(io))
+        router.use(`${BASE_PATH}/chat`, chatRouter(io))
         router.all('*', (req: Request, res: Response) => {
             handle(req, res)
         })

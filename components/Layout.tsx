@@ -11,6 +11,13 @@ type Props = {
 
 const GlobalStyles = createGlobalStyle`
   ${reset}
+  html, body, #__next{
+
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex: 1 1 auto;
+  }
 `
 
 const Head = (): JSX.Element => (
@@ -39,4 +46,5 @@ const Container = styled.div`
     display: flex;
     flex-flow: row nowrap;
     flex: 1 1 auto;
+    position: relative;
 `
