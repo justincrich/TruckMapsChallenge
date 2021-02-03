@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import SocketIo from 'socket.io'
 import { chatDb } from './ChatDB'
-import { User, ChatMessage } from '../util/types'
+import { ChatMessage } from '../util/types'
 import { SOCKET_EVENTS } from '../util/constants'
 
 export const chatRouter = (io: SocketIo.Server): Router => {
@@ -25,7 +25,7 @@ export const chatRouter = (io: SocketIo.Server): Router => {
     io.on(SOCKET_EVENTS.CONNECTION_SERVER, (socket: SocketIo.Socket) => {
         socket.on(SOCKET_EVENTS.SEND_MESSAGE, (message: ChatMessage) => {
             chatDb.setMessage(message)
-            socket.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
+            io.emit(SOCKET_EVENTS.NEW_MESSAGE, message)
         })
     })
 

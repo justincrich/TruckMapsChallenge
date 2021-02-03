@@ -1,12 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
 import * as Icons from 'react-icons/fa'
+
 import { sizing } from '../styles/mixins/constants'
 import { color as colorSelect } from '../styles/color'
 import { ThemeSelector } from '../styles/index'
 
 type ColorType = 'primary' | 'inverted' | 'muted' | 'activity'
-type IconName = keyof typeof Icons
+export type IconName = keyof typeof Icons
 
 export interface IconsProps {
     className?: string
@@ -14,12 +15,21 @@ export interface IconsProps {
     color?: ColorType | ThemeSelector
     title?: string
     size?: string
+    disabled?: boolean
     onClick?: () => void
 }
 
 export const Icon = React.forwardRef(
     (props: IconsProps, ref: React.Ref<HTMLDivElement>): JSX.Element => {
-        const { className, iconName, color, size, onClick, title } = props
+        const {
+            className,
+            iconName,
+            color,
+            size,
+            onClick,
+            title,
+            disabled,
+        } = props
         const Component = Icons[iconName]
         if (!Component) {
             throw new Error('Invalid Icon')
@@ -32,6 +42,7 @@ export const Icon = React.forwardRef(
                 size={size || sizing[2]}
                 coloring={coloring}
                 className={className}
+                disabled={Boolean(disabled)}
                 onClick={() => {
                     if (onClick) {
                         onClick()
@@ -47,6 +58,8 @@ export const Icon = React.forwardRef(
 const Container = styled.div<{
     coloring: ColorType | ThemeSelector
     size: string
+    disabled: boolean
+    onClick?: Function
 }>`
     width: ${(p) => p.size};
     height: ${(p) => p.size};
@@ -61,5 +74,8 @@ const Container = styled.div<{
         }};
         width: 100%;
         height: 100%;
+        ${(p) => (p.disabled ? 'opacity: 0.5;' : '')}
     }
+
+    ${(p) => (p.onClick ? 'cursor: pointer;' : '')}
 `

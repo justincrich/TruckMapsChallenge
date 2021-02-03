@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from 'react'
 import { ListenerType, Callback } from '../clients/type'
 
@@ -15,25 +16,18 @@ export const useClientSubscription = <Data>(params: {
     const { onValue, onError, clientSubscriptionFn } = params
     const [data, setData] = useState<Data | null>(params.initialValue || null)
     const [error, setError] = useState<Error | null>(null)
-    const handleValue = useCallback<Callback<Data>>(
-        (nextData) => {
-            setData(nextData)
-            setError(null)
-            if (onValue) {
-                onValue(nextData)
-            }
-        },
-        [onValue]
-    )
+    const handleValue = useCallback<Callback<Data>>((nextData) => {
+        setData(nextData)
+        setError(null)
+        onValue?.(nextData)
+    }, [])
 
     const handleError: Callback<Error> = useCallback<Callback<Error>>(
         (nextError) => {
             setError(nextError)
-            if (onError) {
-                onError(nextError)
-            }
+            onError?.(nextError)
         },
-        [onError]
+        []
     )
     useEffect(() => {
         const unsubscribe = clientSubscriptionFn(handleValue, handleError)
@@ -41,7 +35,6 @@ export const useClientSubscription = <Data>(params: {
         return () => {
             unsubscribe()
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return {

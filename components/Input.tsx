@@ -4,7 +4,10 @@ import { Label } from './Label'
 import { mixins } from '../styles/mixins'
 import { color } from '../styles/color'
 import { isKeyPressEnter } from '../util/isKeyPressEnter'
-import { BORDER_RADIUS } from '../styles/mixins/constants'
+import { BORDER_RADIUS, SPACING } from '../styles/mixins/constants'
+import { Icon, IconName } from './Icon'
+import { Spacer } from './Spacer'
+import { SubMessage } from './SubMessage'
 
 interface InputProps {
     error?: string
@@ -21,7 +24,11 @@ interface InputProps {
     onEnterPress?: () => void
     isTextArea?: boolean
     kind?: 'textinput' | 'textarea'
-    actionElement?: JSX.Element | JSX.Element[]
+    action?: {
+        icon: IconName
+        onAction: () => void
+        disabled?: boolean
+    }
 }
 
 export const Input = React.forwardRef(
@@ -43,7 +50,7 @@ export const Input = React.forwardRef(
             type,
             kind = 'textinput',
             onBlur,
-            actionElement,
+            action,
         } = props
 
         const handleKeyUp = (
@@ -64,10 +71,10 @@ export const Input = React.forwardRef(
             type,
             onBlur,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onChange: (e: any) => {
-                if (!onChange) return null
+            onChange: (e: any): void => {
+                if (!onChange) return undefined
                 onChange(e.target.value)
-                return null
+                return undefined
             },
         }
 
@@ -79,14 +86,28 @@ export const Input = React.forwardRef(
                     <StyledLabel hasError={Boolean(error)}>{label}</StyledLabel>
                 )}
                 <Content>
+                    {action && (
+                        <ActionContainer>
+                            <Icon
+                                iconName={action.icon}
+                                onClick={action.onAction}
+                                color="activity"
+                                disabled={action.disabled}
+                            />
+                        </ActionContainer>
+                    )}
                     {kind === 'textarea' ? (
                         <TextAreaField {...inputProps} ref={taRef} />
                     ) : (
                         <TextInputField {...inputProps} ref={inputRef} />
                     )}
-                    {actionElement && <>{actionElement}</>}
                 </Content>
-                {error && <ErrorMessage>{error}</ErrorMessage>}
+                {error && (
+                    <>
+                        <Spacer size={1} vertical />
+                        <SubMessage isError>{error}</SubMessage>
+                    </>
+                )}
             </Container>
         )
     }
@@ -112,7 +133,7 @@ const INPUT_STYLE = css<Input>`
     &::placeholder {
         opacity: 0.7;
     }
-    background-color: ${color.background.app};
+    background-color: ${color.background.content};
     border: ${(p) => (p.disabled ? 0 : 1)}px solid
         ${(p) => (p.hasError ? color.status.error : color.border.primary)};
     border-radius: ${BORDER_RADIUS};
@@ -129,6 +150,7 @@ const Content = styled.div`
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
+    position: relative;
 `
 
 export const TextInputField = styled.input<Input>`
@@ -141,8 +163,9 @@ export const TextAreaField = styled.textarea<Input>`
     resize: none;
 `
 
-export const ErrorMessage = styled.div`
-    margin-top: ${mixins.spacing[1]};
-    ${mixins.text('sub')}
-    color: ${color.status.error};
+const ActionContainer = styled.div`
+    position: absolute;
+    right: ${SPACING[1]};
+    top: 50%;
+    transform: translate(-50%, -50%);
 `

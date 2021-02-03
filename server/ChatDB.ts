@@ -1,23 +1,13 @@
 import { ChatMessage, User } from '../util/types'
 
 class ChatDB {
-    private messages: ChatMessage[] = [
-        {
-            message: 'hii',
-            userId: 'justinrich2008@gmail.com',
-        },
-    ]
+    private messages: ChatMessage[] = []
 
-    private users: Record<string, User> = {
-        'justinrich2008@gmail.com': {
-            userId: 'justinrich2008@gmail.com',
-            name: 'Justin',
-        },
-    }
+    private users: Record<string, User> = {}
 
     setMessage(message: ChatMessage): void {
         this.messages.push(message)
-        console.warn('new messages', this.messages)
+        console.log(this.messages)
     }
 
     getAllMessages(): ChatMessage[] {

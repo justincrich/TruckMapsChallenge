@@ -13,8 +13,6 @@ import { UserState } from './types'
 
 const REDUCER_NAME = 'user'
 
-// const socket = subscribeToSocketEvent()
-
 const createUserActionType = (name: string): string =>
     createActionType(name, REDUCER_NAME)
 

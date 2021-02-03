@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { NextPage } from 'next'
 import { Layout } from '../components/Layout'
@@ -11,27 +11,105 @@ import { RootState } from '../store/rootReducer'
 import { userClient } from '../clients/UserClient'
 import { useUserClient } from '../hooks/useUserClient'
 import { SignupModal } from '../components/SignupModal'
+import { ChatInput } from '../components/ChatInput'
+import { SPACING } from '../styles/mixins/constants'
+import { Spacer } from '../components/Spacer'
+import { ChatEntry } from '../components/ChatEntry'
 
 type Props = {
     chatHistory: ChatMessage[]
     initialReduxState: RootState
 }
 
-const Home: NextPage<Props> = ({ chatHistory }) => {
+const Home: NextPage<Props> = ({ chatHistory: initialMessages }) => {
+    const scrollRef = useRef<HTMLDivElement | null>(null)
     const { userDirectory, you } = useUserClient()
-    const { messages } = useChatClient(chatHistory)
+    const { messages, send } = useChatClient({
+        initialMessages,
+    })
 
-    const chatMessages = messages || chatHistory
-
-    console.log(chatMessages)
-
+    useEffect(() => {
+        if (scrollRef.current) {
+            const { scrollHeight } = scrollRef.current
+            scrollRef.current.scrollTop = scrollHeight
+        }
+    }, [messages.length])
     return (
         <Layout>
-            <h1 className="title">Chat App</h1>
-            {!you ? <SignupModal /> : <div />}
+            <Container>
+                <h1 className="title">Chat App</h1>
+                {!you ? <SignupModal /> : <div />}
+                <Body ref={scrollRef}>
+                    <MessageContainer>
+                        {messages.map((entry) => (
+                            <ChatEntry
+                                isYou={you?.userId === entry.userId}
+                                name={
+                                    userDirectory[entry.userId]?.name ||
+                                    entry.userId
+                                }
+                                message={entry.message}
+                            />
+                        ))}
+                    </MessageContainer>
+                </Body>
+                <Footer>
+                    <ChatInput
+                        onSubmit={(nextMessage) => {
+                            send(you.userId, nextMessage)
+                        }}
+                    />
+                    <Spacer vertical size={3} />
+                </Footer>
+            </Container>
         </Layout>
     )
 }
+
+const Container = styled.div`
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    position: relative;
+`
+
+const Body = styled.div`
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    flex: 1 1 auto;
+`
+
+const MessageContainer = styled.div`
+    display: flex;
+    max-width: 500px;
+    width: 100%;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+    min-height: 0px;
+    ${ChatEntry.Container} {
+        margin-bottom: ${SPACING[1]};
+    }
+    ${ChatEntry.Container}:last-child {
+        padding-bottom: 100px;
+    }
+`
+
+const Footer = styled.div`
+    width: 100%;
+    bottom: 0;
+    position: absolute;
+    padding: ${SPACING[1]};
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    ${ChatInput.Input} {
+        max-width: 500px;
+        width: 100%;
+    }
+`
 
 export async function getServerSideProps(): Promise<{
     props: Props

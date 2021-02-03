@@ -10,7 +10,6 @@ import { Button as RawButton } from './Button'
 import { Input } from './Input'
 import { Spacer } from './Spacer'
 import { useUserClient } from '../hooks/useUserClient'
-import { registerUser } from '../store/user'
 
 const schema = yup.object().shape({
     name: yup.string().required('required'),
@@ -63,6 +62,7 @@ export const SignupModal = (): JSX.Element => {
 }
 
 const Container = styled.div`
+    z-index: 100;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.5);
     width: 100%;

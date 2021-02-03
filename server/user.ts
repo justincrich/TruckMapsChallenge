@@ -44,7 +44,7 @@ export const userRouter = (io: SocketIo.Server): Router => {
     // LISTENERS
 
     io.on(SOCKET_EVENTS.CONNECTION_SERVER, (socket: SocketIo.Socket) => {
-        socket.on(SOCKET_EVENTS.NEW_USER, (data: User) => {
+        socket.on(SOCKET_EVENTS.REGISTER_USER, (data: User) => {
             chatDb.setUser(data)
             io.emit(SOCKET_EVENTS.NEW_USER, data)
         })
