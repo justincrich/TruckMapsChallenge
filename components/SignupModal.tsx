@@ -64,6 +64,8 @@ export const SignupModal = (): JSX.Element => {
 const Container = styled.div`
     z-index: 100;
     position: absolute;
+    top: 0;
+    left: 0;
     background-color: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;

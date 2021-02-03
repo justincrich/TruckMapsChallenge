@@ -15,6 +15,7 @@ import { ChatInput } from '../components/ChatInput'
 import { SPACING } from '../styles/mixins/constants'
 import { Spacer } from '../components/Spacer'
 import { ChatEntry } from '../components/ChatEntry'
+import { ChatDirectory } from '../components/ChatDirectory'
 
 type Props = {
     chatHistory: ChatMessage[]
@@ -37,7 +38,11 @@ const Home: NextPage<Props> = ({ chatHistory: initialMessages }) => {
     return (
         <Layout>
             <Container>
-                <h1 className="title">Chat App</h1>
+                <Header>
+                    <h1 className="title">Chat App</h1>
+                    <Spacer vertical size={2} />
+                    <ChatDirectory directory={userDirectory} />
+                </Header>
                 {!you ? <SignupModal /> : <div />}
                 <Body ref={scrollRef}>
                     <MessageContainer>
@@ -67,6 +72,7 @@ const Home: NextPage<Props> = ({ chatHistory: initialMessages }) => {
 }
 
 const Container = styled.div`
+    padding: ${SPACING[2]};
     display: flex;
     flex-flow: column nowrap;
     flex: 1 1 auto;
@@ -80,6 +86,12 @@ const Body = styled.div`
     display: flex;
     justify-content: center;
     flex: 1 1 auto;
+`
+
+const Header = styled.div`
+    position: fixed;
+    left: 8px;
+    top: 8px;
 `
 
 const MessageContainer = styled.div`
