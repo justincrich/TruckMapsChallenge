@@ -1,5 +1,5 @@
 {
-  "name": "justin-rich-truck-maps",
+  "name": "justin-rich-truck-map",
   "author": "Justin Rich <justin@hackerpug.com>",
   "scripts": {
     "build-server": "ts-node ./server/index.ts",
@@ -17,7 +17,6 @@
     "@types/next": "^9.0.0",
     "@types/react": "^17.0.0",
     "@types/socket.io": "^2.1.13",
-    "and": "^0.0.3",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
